@@ -37,8 +37,8 @@
   // Forward the default Angular port
   "forwardPorts": [4200],
 
-  // OPTIONAL: Run npm install automatically when the container is created
-  "postCreateCommand": "npm install -g npm@11.10.1",
+  // Run the setup script automatically when the container is created
+  "postCreateCommand": "bash .devcontainer/setup.sh",
 
   // Lifecycle scripts
   "postStartCommand": "echo 'Container started. Run \"npm start\" to serve.'"
