@@ -1,0 +1,45 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "Geospatial Angular",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  // Set the remote user to 'node' (provided by the base image)
+  // to avoid permission issues with node_modules
+  "remoteUser": "node",
+
+  "features": {
+    // Adds common utilities securely
+    "ghcr.io/devcontainers/features/git:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/bash",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        }
+      },
+      // Essential extensions for Angular development
+      "extensions": [
+        "Angular.ng-template",      // Angular Language Service
+        "dbaeumer.vscode-eslint",   // ESLint
+        "esbenp.prettier-vscode",   // Prettier
+        "editorconfig.editorconfig" // EditorConfig
+      ]
+    }
+  },
+
+  // Forward the default Angular port
+  "forwardPorts": [4200],
+
+  // OPTIONAL: Run npm install automatically when the container is created
+  "postCreateCommand": "npm install -g npm@11.10.1",
+
+  // Lifecycle scripts
+  "postStartCommand": "echo 'Container started. Run \"npm start\" to serve.'"
+}
