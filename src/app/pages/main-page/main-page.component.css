@@ -1,0 +1,23 @@
+/* The main wrapper that fills the entire browser window */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* Prevents the whole page from scrolling */
+  background-color: #f4f4f4;
+}
+
+/* The map takes up all remaining flexible space */
+.map-section {
+  flex-grow: 1;
+  position: relative;
+}
+
+/* The sidebar stays locked at exactly 350 pixels wide */
+.sidebar-section {
+  width: 350px;
+  min-width: 350px;
+  /* Adds a nice drop shadow to separate the list from the map */
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}

@@ -1,0 +1,17 @@
+<div class="list-container">
+  <div class="scroll-area">
+    @for (point of coordinateList; track $index) {
+      <div class="coordinate-card">
+        <p class="point-title">Point {{ $index + 1 }}</p>
+        <p><strong>Lat:</strong> {{ point.latitude | number: '1.4-12' }}</p>
+        <p><strong>Lon:</strong> {{ point.longitude | number: '1.4-12' }}</p>
+
+        @if (point.elevation !== undefined) {
+          <p><strong>Elev:</strong> {{ point.elevation | number: '1.0-3' }} meters</p>
+        }
+      </div>
+    } @empty {
+      <p class="empty-message">Click on the map to record a location.</p>
+    }
+  </div>
+</div>

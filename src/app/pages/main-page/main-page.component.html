@@ -1,0 +1,9 @@
+<div class="app-layout">
+  <div class="sidebar-section">
+    <component-coordinate-list [coordinateList]="coordinateList"></component-coordinate-list>
+  </div>
+
+  <div class="map-section">
+    <map-arcgis (mapClicked)="handleMapClick($event)"></map-arcgis>
+  </div>
+</div>

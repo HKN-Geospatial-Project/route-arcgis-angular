@@ -1,0 +1,53 @@
+.list-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-left: 1px solid #e0e0e0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.list-container h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Allows the list to scroll internally if it gets too long */
+.scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.coordinate-card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.point-title {
+  font-weight: bold;
+  color: #005e95; /* Esri/ArcGIS blue */
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.coordinate-card p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.empty-message {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  margin-top: 30px;
+}
