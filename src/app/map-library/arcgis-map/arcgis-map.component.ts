@@ -1,19 +1,28 @@
-import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  NgZone,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 
 import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import ElevationLayer from '@arcgis/core/layers/ElevationLayer';
 
-interface ClickCoordinates {
+export interface ClickedCoordinate {
   latitude: number | null | undefined;
   longitude: number | null | undefined;
-  elevation?: number;
+  elevation: number | undefined;
   x: number;
   y: number;
 }
 
 @Component({
-  selector: 'app-arcgis-map',
+  selector: 'map-arcgis',
   standalone: true,
   imports: [],
   templateUrl: './arcgis-map.component.html',
@@ -22,10 +31,11 @@ interface ClickCoordinates {
 export class ArcgisMapComponent implements OnInit, OnDestroy {
   @ViewChild('mapViewNode', { static: true }) private mapViewEl!: ElementRef;
 
-  private view!: MapView;
-  public clickedLocation: ClickCoordinates | null = null;
+  @Output() mapClicked = new EventEmitter<ClickedCoordinate>();
 
-  constructor() {}
+  private view!: MapView;
+
+  constructor(private zone: NgZone) {}
 
   ngOnInit(): void {
     this.initializeMap();
@@ -55,7 +65,7 @@ export class ArcgisMapComponent implements OnInit, OnDestroy {
         const elevation = result.geometry.z;
 
         // Bundle all the data into our interface payload
-        const payload: ClickCoordinates = {
+        const payload: ClickedCoordinate = {
           latitude: event.mapPoint.latitude ?? undefined,
           longitude: event.mapPoint.longitude ?? undefined,
           elevation: elevation !== undefined ? elevation : undefined,
@@ -63,9 +73,9 @@ export class ArcgisMapComponent implements OnInit, OnDestroy {
           y: event.y,
         };
 
-        // Console logs for debugging
-        console.log('--- Map Click Event ---');
-        console.log(payload);
+        this.zone.run(() => {
+          this.mapClicked.emit(payload);
+        });
       } catch (error) {
         console.error('Failed to query coordinates:', error);
       }
