@@ -1,0 +1,23 @@
+.page-layout {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar-section {
+  width: 380px;
+  min-width: 380px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.map-section {
+  flex-grow: 1;
+  position: relative;
+}

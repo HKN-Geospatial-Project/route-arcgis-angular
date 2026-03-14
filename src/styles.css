@@ -1,1 +1,61 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* --- Global Typography --- */
+h2, h3 { margin-top: 0; color: #333; }
+hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }
+.empty-msg { color: #888; font-style: italic; font-size: 14px; text-align: center; margin-top: 20px; }
+
+/* --- Global Forms & Inputs --- */
+.text-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* --- Global Base Button --- */
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+button:hover:not(:disabled) { opacity: 0.8; }
+button:disabled { background: #cccccc; cursor: not-allowed; color: #666; }
+
+/* --- Solid Standard Buttons --- */
+.btn-primary { background: #0079c1; color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+.btn-success { background: #28a745; color: white; }
+
+/* --- Outline Buttons --- */
+.btn-outline-primary { background: transparent; color: #005e95; border: 1px solid #005e95; padding: 5px 12px; }
+.btn-outline-primary:hover:not(:disabled) { background: #e6f2f9; }
+
+.btn-outline-danger { background: transparent; color: #dc3545; border: 1px solid #dc3545; padding: 5px 12px; }
+.btn-outline-danger:hover:not(:disabled) { background: #fdf2f3; }
+
+/* --- Small Icon Buttons --- */
+.btn-icon { background: #f8f9fa; border: 1px solid #ddd; padding: 5px 10px; font-size: 14px; }
+.btn-icon:hover:not(:disabled) { background: #e2e6ea; }
+.btn-icon:disabled { opacity: 0.4; }
+
+/* --- Modern Pill Buttons --- */
+.btn-modern-cancel { background: transparent; color: #6c757d; border-radius: 20px; padding: 6px 14px; }
+.btn-modern-cancel:hover:not(:disabled) { background: #f1f3f5; color: #343a40; }
+
+.btn-modern-save { background: #28a745; color: white; border-radius: 20px; padding: 6px 18px; box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2); }
+.btn-modern-save:hover:not(:disabled) { background: #218838; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); }
