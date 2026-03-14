@@ -1,1 +1,66 @@
-<p>create-route-page.component works!</p>
+<div class="page-layout">
+  <div class="sidebar-section">
+    <h2>Create New Route</h2>
+
+    <div class="control-group">
+      <label for="routeName">Route Name</label>
+
+      <input
+        type="text"
+        id="routeName"
+        [(ngModel)]="routeName"
+        placeholder="e.g., Morning Run"
+        class="text-input"
+      />
+    </div>
+
+    <hr />
+
+    <div class="control-group">
+      <h3>Add the Point Manually</h3>
+
+      <div class="manual-inputs">
+        <div class="input-col">
+          <label>Latitude</label>
+
+          <input type="number" [(ngModel)]="manualLat" placeholder="Lat" class="text-input" />
+        </div>
+
+        <div class="input-col">
+          <label>Longitude</label>
+
+          <input type="number" [(ngModel)]="manualLon" placeholder="Lon" class="text-input" />
+        </div>
+      </div>
+
+      <button class="btn-primary" (click)="addManualPoint()" [disabled]="!isManualAddValid">
+        Add Point
+      </button>
+    </div>
+
+    <hr />
+
+    <div class="points-list-container">
+      <h3>Route Points ({{ pointList.length }})</h3>
+
+      <component-route-point-list
+        [pointList]="pointList"
+        (pointUpdated)="onListPointEdited($event)"
+        (pointDeleted)="onListPointDeleted($event)"
+        (pointMoved)="onListPointMoved($event)"
+      ></component-route-point-list>
+    </div>
+
+    <hr />
+
+    <div class="action-buttons">
+      <button class="btn-secondary" (click)="goBack()">Back</button>
+      <button class="btn-danger" (click)="resetRoute()">Reset</button>
+      <button class="btn-success" (click)="saveRoute()">Save Route</button>
+    </div>
+  </div>
+
+  <div class="map-section">
+    <map-arcgis (mapClicked)="onMapClick($event)"> </map-arcgis>
+  </div>
+</div>

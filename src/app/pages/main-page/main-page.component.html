@@ -1,9 +1,8 @@
-<div class="app-layout">
+<div class="page-layout">
   <div class="sidebar-section">
-    <component-coordinate-list [coordinateList]="coordinateList"></component-coordinate-list>
+    <button class="btn-primary" (click)="navigateCreateRoutePage()">Create Route</button>
   </div>
-
   <div class="map-section">
-    <map-arcgis (mapClicked)="handleMapClick($event)"></map-arcgis>
+    <map-arcgis></map-arcgis>
   </div>
 </div>
