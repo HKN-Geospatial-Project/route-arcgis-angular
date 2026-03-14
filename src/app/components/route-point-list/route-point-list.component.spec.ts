@@ -1,18 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CoordinateListComponent } from './coordinate-list.component';
+import { RoutePointListComponent } from './route-point-list.component';
 
 describe('CoordinateListComponent', () => {
-  let component: CoordinateListComponent;
-  let fixture: ComponentFixture<CoordinateListComponent>;
+  let component: RoutePointListComponent;
+  let fixture: ComponentFixture<RoutePointListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CoordinateListComponent]
-    })
-    .compileComponents();
+      imports: [RoutePointListComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(CoordinateListComponent);
+    fixture = TestBed.createComponent(RoutePointListComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

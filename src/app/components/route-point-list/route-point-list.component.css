@@ -1,0 +1,80 @@
+/* --- Component Host --- */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* --- Base Card Styling --- */
+.point-card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+.point-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d0d0d0;
+}
+.point-card.expanded {
+  border-left: 4px solid #005e95;
+  box-shadow: 0 4px 12px rgba(0, 94, 149, 0.15);
+}
+
+.header-click {
+  cursor: pointer;
+  user-select: none;
+}
+
+.point-title {
+  font-weight: bold;
+  color: #005e95;
+  display: block;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+/* --- Coordinate Data Grid --- */
+.coords-container { margin-top: 8px; }
+.data-grid { display: flex; flex-direction: column; gap: 6px; }
+.data-row { display: flex; align-items: center; font-size: 14px; color: #555; }
+
+.data-label { width: 75px; font-weight: 600; color: #333; }
+.data-value { color: #005e95; font-family: monospace; font-size: 14px; }
+
+/* Specific styling for the inputs inside the grid to match the monospace numbers */
+.inline-input {
+  max-width: 150px;
+  background-color: #fafafa;
+  font-family: monospace;
+}
+.inline-input:focus {
+  outline: none;
+  border-color: #005e95;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 94, 149, 0.2);
+}
+
+/* --- Management Toolbar --- */
+.management-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.action-group { display: flex; gap: 8px; }
+.edit-actions { display: flex; gap: 10px; justify-content: flex-end; width: 100%; }

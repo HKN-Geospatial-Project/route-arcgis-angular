@@ -1,0 +1,101 @@
+<div class="scroll-area">
+  @for (item of reversedPoints; track item.originalIndex) {
+    <div class="point-card" [class.expanded]="expandedIndex === item.originalIndex">
+      <div class="view-mode header-click" (click)="toggleExpand(item.originalIndex)">
+        <span class="point-title">Point {{ item.originalIndex + 1 }}</span>
+
+        <div class="coords-container">
+          @if (editingIndex === item.originalIndex) {
+            <div class="data-grid" (click)="$event.stopPropagation()">
+              <div class="data-row">
+                <span class="data-label">Latitude:</span>
+                <input
+                  type="number"
+                  [(ngModel)]="editLatitude"
+                  class="text-input inline-input"
+                  placeholder="0.0000"
+                />
+              </div>
+              <div class="data-row">
+                <span class="data-label">Longitude:</span>
+                <input
+                  type="number"
+                  [(ngModel)]="editLongitude"
+                  class="text-input inline-input"
+                  placeholder="0.0000"
+                />
+              </div>
+            </div>
+          } @else {
+            <div class="data-grid">
+              <div class="data-row">
+                <span class="data-label">Latitude:</span>
+                <span class="data-value">{{
+                  item.point.latitude !== null && item.point.latitude !== undefined
+                    ? (item.point.latitude | number: '1.4-12')
+                    : '--'
+                }}</span>
+              </div>
+
+              <div class="data-row">
+                <span class="data-label">Longitude:</span>
+                <span class="data-value">{{
+                  item.point.longitude !== null && item.point.longitude !== undefined
+                    ? (item.point.longitude | number: '1.4-12')
+                    : '--'
+                }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (expandedIndex === item.originalIndex) {
+        <div class="management-toolbar">
+          @if (editingIndex === item.originalIndex) {
+            <div class="action-buttons edit-actions">
+              <button class="btn-modern-cancel" (click)="cancelEdit()">Cancel</button>
+              <button
+                class="btn-modern-save"
+                (click)="saveEdit(item.originalIndex)"
+                [disabled]="!isEditValid"
+              >
+                Save Changes
+              </button>
+            </div>
+          } @else {
+            <div class="action-group">
+              <button
+                class="btn-icon"
+                (click)="movePointUp(item.originalIndex)"
+                [disabled]="item.originalIndex === pointList.length - 1"
+                title="Move Up"
+              >
+                ⬆️
+              </button>
+              <button
+                class="btn-icon"
+                (click)="movePointDown(item.originalIndex)"
+                [disabled]="item.originalIndex === 0"
+                title="Move Down"
+              >
+                ⬇️
+              </button>
+            </div>
+
+            <div class="action-group">
+              <button class="btn-outline-primary" (click)="startEdit(item.originalIndex)">
+                Edit
+              </button>
+              <button class="btn-outline-danger" (click)="deletePoint(item.originalIndex)">
+                Delete
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  } @empty {
+    <p class="empty-msg">No points added yet. Click the map or enter coordinates manually.</p>
+  }
+</div>
