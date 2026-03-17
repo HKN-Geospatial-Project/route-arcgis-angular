@@ -1,5 +1,5 @@
 // Angular Core Imports
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import {
   RoutePointListComponent,
   RoutePointListItem,
 } from '../../components/route-point-list/route-point-list.component';
+import { RouteStateService } from '../../map-library/services/route-state.service';
 
 /**
  * Orchestrates the route creation workflow.
@@ -35,26 +36,49 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Service that broadcasts clicks from the ArcGIS Map component. */
   private mapEventProviderService = inject(MapEventProviderService);
 
-  /** Service responsible for drawing markers and lines on the map. */
-  private routeService = inject(RouteGraphicsService);
+  /** Centralized state manager for the route points. */
+  public routeState = inject(RouteStateService);
 
   // --- State Variables ---
 
   /** The user-defined name for the route being created. */
   public routeName: string = '';
 
-  /** The collection of points that make up the current route. */
-  public pointList: RoutePointListItem[] = [];
-
-  /** Reactive Signal for the latitude input. */
+  /** Reactive Signal for the latitude input field. */
   public manualLat = signal<number | null | undefined>(null);
 
-  /** Reactive Signal for the longitude input. */
+  /** Reactive Signal for the longitude input field. */
   public manualLon = signal<number | null | undefined>(null);
 
   /**
-   * Initializes the component by subscribing to map click events.
+   * Initializes the component and sets up the reactive rendering effect.
+   * @param routeService - Service responsible for drawing graphics on the map.
    */
+  constructor(private routeService: RouteGraphicsService) {
+    /**
+     * THE REACTIVE ENGINE:
+     * This effect automatically watches the `routeState.points()` signal.
+     * Whenever a point is added, moved, or deleted from anywhere in the app,
+     * this effect fires, transforms the data to satisfy strict interfaces,
+     * and forces the map to redraw instantly.
+     */
+    effect(() => {
+      const currentPoints = this.routeState.points(); // Read the signal
+
+      if (currentPoints.length === 0) {
+        this.routeService.clearAll();
+      } else {
+        // Map the array to explicitly define missing properties (like altitude)
+        const mappedPoints = currentPoints.map((pt) => ({
+          ...pt,
+          altitude: undefined,
+        }));
+        this.routeService.renderRoute(mappedPoints);
+      }
+    });
+  }
+
+  /** Initializes the component by subscribing to map click events. */
   ngOnInit(): void {
     this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
       (clickedCoordinate: ClickedCoordinate) => {
@@ -72,19 +96,13 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Adds the current signal values to the local point list and
-   * instructs the map service to render a new point/segment.
+   * Pushes the current manual input values into the global RouteState.
+   * Note: The map rendering is handled automatically by the effect().
    */
   public addManualPoint(): void {
-    this.pointList.push({
+    this.routeState.addPoint({
       latitude: this.manualLat(),
       longitude: this.manualLon(),
-    });
-
-    this.routeService.addPoint({
-      latitude: this.manualLat(),
-      longitude: this.manualLon(),
-      altitude: undefined,
     });
   }
 
@@ -92,50 +110,32 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     console.log('saveRoute');
   }
 
-  /** Resets the local state and clears all graphics from the map. */
+  /** Wipes the global route state, which triggers the map to clear itself. */
   public resetRoute(): void {
-    this.pointList = [];
-    this.routeService.clearAll();
+    this.routeState.clearRoute();
   }
 
-  /** Navigates back to the main landing page. */
+  /** Navigates back to the main page. */
   public goBack(): void {
     this.router.navigate(['/main-page']);
   }
 
-  /**
-   * Handles updates from the child list component when a point is edited.
-   * Reassigns the array to trigger Angular's change detection.
-   */
+  /** Delegates point edits from the UI list to the global state. */
   public onListPointEdited(event: { index: number; updatedPoint: RoutePointListItem }) {
-    const newArray = [...this.pointList];
-    newArray[event.index] = event.updatedPoint;
-    this.pointList = newArray;
+    this.routeState.updatePoint(event.index, event.updatedPoint);
   }
 
-  /** Removes a point from the list based on its index. */
+  /** Delegates point deletion from the UI list to the global state. */
   public onListPointDeleted(index: number): void {
-    this.pointList = this.pointList.filter((_, i) => i !== index);
+    this.routeState.removePoint(index);
   }
 
+  /** Delegates point reordering from the UI list to the global state. */
   public onListPointMoved(event: { oldIndex: number; newIndex: number }): void {
-    // 1. Create a shallow copy of the array
-    const newArray = [...this.pointList];
-
-    // 2. Remove the item from its old position
-    const [movedItem] = newArray.splice(event.oldIndex, 1);
-
-    // 3. Insert the item into its new position
-    newArray.splice(event.newIndex, 0, movedItem);
-
-    // 4. Reassign the array to trigger Angular's change detection for the Map
-    this.pointList = newArray;
+    this.routeState.movePoint(event.oldIndex, event.newIndex);
   }
 
-  /**
-   * Validates if the current signal values represent a valid geographic coordinate.
-   * Uses a utility helper for the logic.
-   */
+  /** Validates if the current signal values represent a valid geographic coordinate. */
   public get isManualAddValid(): boolean {
     return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
   }

@@ -14,5 +14,5 @@ export interface Coordinates {
   /**
    * The elevation or height of the point in meters.
    */
-  altitude: number | undefined;
+  altitude: number | null | undefined;
 }
