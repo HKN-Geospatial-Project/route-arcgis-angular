@@ -1,9 +1,10 @@
 @import "../../../styles/page-styles.css";
 
-/* Only layout rules specific to the form on this page */
+/** * Spacing for form logical groups. */
 .control-group { margin-bottom: 15px; }
 .control-group label { display: block; font-size: 14px; margin-bottom: 5px; color: #555; }
 
+/** * Flexbox container for side-by-side coordinate inputs. */
 .manual-inputs {
   display: flex;
   gap: 10px;
@@ -11,10 +12,12 @@
 }
 .input-col { flex: 1; }
 
-/* Specific override for the primary button on this exact page to stretch 100% */
-.btn-primary.full-width { width: 100%; }
+/** * Specific override for the primary button on this exact page to stretch 100% */
+.btn-primary { width: 100%; }
 
-/* The container holding the child component */
+/** * Allows the list container to grow and fill available vertical space
+ * within the sidebar, enabling internal scrolling if the list is long.
+ */
 .points-list-container {
   flex-grow: 1;
   display: flex;
@@ -22,7 +25,7 @@
   overflow: hidden;
 }
 
-/* The layout for the bottom action buttons */
+/** * Fixed footer for action buttons using space-between for alignment. */
 .action-buttons {
   display: flex;
   justify-content: space-between;

@@ -17,24 +17,36 @@
     <hr />
 
     <div class="control-group">
-      <h3>Add the Point Manually</h3>
+      <h3>Click the map or enter coordinates manually.</h3>
 
       <div class="manual-inputs">
         <div class="input-col">
           <label>Latitude</label>
 
-          <input type="number" [(ngModel)]="manualLat" placeholder="Lat" class="text-input" />
+          <input
+            type="number"
+            [ngModel]="manualLat()"
+            (ngModelChange)="manualLat.set($event)"
+            placeholder="Lat"
+            class="text-input"
+          />
         </div>
 
         <div class="input-col">
           <label>Longitude</label>
 
-          <input type="number" [(ngModel)]="manualLon" placeholder="Lon" class="text-input" />
+          <input
+            type="number"
+            [ngModel]="manualLon()"
+            (ngModelChange)="manualLon.set($event)"
+            placeholder="Lon"
+            class="text-input"
+          />
         </div>
       </div>
 
       <button class="btn-primary" (click)="addManualPoint()" [disabled]="!isManualAddValid">
-        Add Point
+        Add
       </button>
     </div>
 
@@ -58,9 +70,5 @@
       <button class="btn-danger" (click)="resetRoute()">Reset</button>
       <button class="btn-success" (click)="saveRoute()">Save Route</button>
     </div>
-  </div>
-
-  <div class="map-section">
-    <map-arcgis (mapClicked)="onMapClick($event)"> </map-arcgis>
   </div>
 </div>

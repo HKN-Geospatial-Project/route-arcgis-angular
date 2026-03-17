@@ -1,84 +1,123 @@
-import { Component } from '@angular/core';
+// Angular Core Imports
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import {
-  ArcgisMapComponent,
-  ClickedCoordinate,
-} from '../../map-library/arcgis-map/arcgis-map.component';
+// Application Core Imports
+import { ClickedCoordinate } from '../../map-library/models/clicked-coordinate.model';
+import { CoordinateUtils } from '../../utils/coordinate.utils';
+import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
+import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
 import {
   RoutePointListComponent,
   RoutePointListItem,
 } from '../../components/route-point-list/route-point-list.component';
-import { CoordinateUtils } from '../../utils/coordinate.utils';
 
+/**
+ * Orchestrates the route creation workflow.
+ */
 @Component({
   selector: 'create-route-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, ArcgisMapComponent, RoutePointListComponent],
+  imports: [CommonModule, FormsModule, RoutePointListComponent],
   templateUrl: './create-route-page.component.html',
   styleUrls: ['./create-route-page.component.css'],
 })
-export class CreateRoutePageComponent {
-  constructor(private router: Router) {}
+export class CreateRoutePageComponent implements OnInit, OnDestroy {
+  /** Subscription to the global map click event stream. Must be cleaned up on destroy. */
+  private clickSubscription!: Subscription;
+
+  /** Service for programmatic page navigation. */
+  private router = inject(Router);
+
+  /** Service that broadcasts clicks from the ArcGIS Map component. */
+  private mapEventProviderService = inject(MapEventProviderService);
+
+  /** Service responsible for drawing markers and lines on the map. */
+  private routeService = inject(RouteGraphicsService);
+
   // --- State Variables ---
+
+  /** The user-defined name for the route being created. */
   public routeName: string = '';
+
+  /** The collection of points that make up the current route. */
   public pointList: RoutePointListItem[] = [];
 
-  // Variables to hold the manual input values before they are added
-  public manualLat: number | null | undefined = null;
-  public manualLon: number | null | undefined = null;
+  /** Reactive Signal for the latitude input. */
+  public manualLat = signal<number | null | undefined>(null);
 
-  // --- Methods ---
+  /** Reactive Signal for the longitude input. */
+  public manualLon = signal<number | null | undefined>(null);
 
-  // 1. Triggered when the map framework emits a click event
-  public onMapClick(clickedCoordinate: ClickedCoordinate): void {
-    this.manualLat = clickedCoordinate.latitude;
-    this.manualLon = clickedCoordinate.longitude;
+  /**
+   * Initializes the component by subscribing to map click events.
+   */
+  ngOnInit(): void {
+    this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
+      (clickedCoordinate: ClickedCoordinate) => {
+        this.manualLat.set(clickedCoordinate.latitude);
+        this.manualLon.set(clickedCoordinate.longitude);
+      },
+    );
   }
 
-  // 2. Triggered by the "Add Point" button in the manual entry form
+  /** Unsubscribes from map events to prevent memory leaks. */
+  ngOnDestroy(): void {
+    if (this.clickSubscription) {
+      this.clickSubscription.unsubscribe();
+    }
+  }
+
+  /**
+   * Adds the current signal values to the local point list and
+   * instructs the map service to render a new point/segment.
+   */
   public addManualPoint(): void {
-    const mappedCoordinate: RoutePointListItem = {
-      latitude: this.manualLat,
-      longitude: this.manualLon,
-    };
+    this.pointList.push({
+      latitude: this.manualLat(),
+      longitude: this.manualLon(),
+    });
 
-    this.pointList.push(mappedCoordinate);
-    console.log(this.pointList);
+    this.routeService.addPoint({
+      latitude: this.manualLat(),
+      longitude: this.manualLon(),
+      altitude: undefined,
+    });
   }
 
-  // 3. Triggered by the "Save" button
   public saveRoute(): void {
     console.log('saveRoute');
   }
 
-  // 4. Triggered by the "Reset" button
+  /** Resets the local state and clears all graphics from the map. */
   public resetRoute(): void {
     this.pointList = [];
+    this.routeService.clearAll();
   }
 
-  // 5. Triggered by the "Back" button
+  /** Navigates back to the main landing page. */
   public goBack(): void {
     this.router.navigate(['/main-page']);
   }
 
+  /**
+   * Handles updates from the child list component when a point is edited.
+   * Reassigns the array to trigger Angular's change detection.
+   */
   public onListPointEdited(event: { index: number; updatedPoint: RoutePointListItem }) {
     const newArray = [...this.pointList];
     newArray[event.index] = event.updatedPoint;
-
-    // Reassigning the array triggers the Map to redraw automatically!
     this.pointList = newArray;
   }
 
-  // Triggered when the list component emits a delete action
+  /** Removes a point from the list based on its index. */
   public onListPointDeleted(index: number): void {
-    // Array.filter creates a brand new array, keeping everything EXCEPT the given index
     this.pointList = this.pointList.filter((_, i) => i !== index);
   }
 
-  // Triggered when the list component emits a move action (Up or Down)
   public onListPointMoved(event: { oldIndex: number; newIndex: number }): void {
     // 1. Create a shallow copy of the array
     const newArray = [...this.pointList];
@@ -93,7 +132,11 @@ export class CreateRoutePageComponent {
     this.pointList = newArray;
   }
 
+  /**
+   * Validates if the current signal values represent a valid geographic coordinate.
+   * Uses a utility helper for the logic.
+   */
   public get isManualAddValid(): boolean {
-    return CoordinateUtils.isValidGeographicCoordinate(this.manualLat, this.manualLon);
+    return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
   }
 }

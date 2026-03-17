@@ -1,11 +1,19 @@
+/**
+ * Core layout wrapper for all routed pages.
+ * It occupies the full viewport, ensuring that children (like the sidebar)
+ * can be positioned relative to the screen size.
+ */
 .page-layout {
   display: flex;
   height: 100vh;
   width: 100vw;
-  background-color: #f4f4f4;
   font-family: Arial, sans-serif;
 }
 
+/**
+ * The functional sidebar used for controls, inputs, and lists.
+ * It is pinned to the left side of the screen.
+ */
 .sidebar-section {
   width: 380px;
   min-width: 380px;
@@ -13,11 +21,15 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  /* Adds depth to separate the UI visually from the map underneath */
   box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  /* Ensures the sidebar stays on top of any other UI elements */
   z-index: 10;
-}
-
-.map-section {
-  flex-grow: 1;
-  position: relative;
+  /**
+   * CRITICAL: Re-enables mouse interactions.
+   * Since the parent container (.ui-overlay) uses 'pointer-events: none'
+   * to let clicks reach the map, we MUST set this to 'auto' so
+   * users can click buttons and type in inputs within the sidebar.
+   */
+  pointer-events: auto;
 }

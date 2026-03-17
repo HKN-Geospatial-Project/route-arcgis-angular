@@ -1,0 +1,39 @@
+/**
+ * Main application wrapper.
+ * It forces the app to occupy the full viewport and prevents
+ * any accidental scrollbars from appearing at the root level.
+ */
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/**
+ * Background layer reserved for the Map.
+ * It is positioned absolutely to stay fixed behind any UI elements.
+ */
+.map-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0; /* Ensures the map stays at the bottom of the stack */
+}
+
+/**
+ * Foreground layer for the User Interface.
+ * It covers the entire screen but allows clicks to pass through to the map
+ * below by using 'pointer-events: none'.
+ */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Sits on top of the map */
+  pointer-events: none; /* Crucial: Mouse events bypass the empty space of this div */
+}
