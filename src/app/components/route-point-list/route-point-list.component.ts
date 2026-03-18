@@ -1,8 +1,9 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { CoordinateUtils } from '../../utils/coordinate.utils';
+import { RouteStateService } from '../../map-library/services/route-state.service';
 
 export interface RoutePointListItem {
   latitude: number | null | undefined;
@@ -17,12 +18,8 @@ export interface RoutePointListItem {
   styleUrls: ['./route-point-list.component.css'],
 })
 export class RoutePointListComponent {
-  // --- Inputs & Outputs ---
-  @Input() pointList: RoutePointListItem[] = [];
-
-  @Output() pointUpdated = new EventEmitter<{ index: number; updatedPoint: RoutePointListItem }>();
-  @Output() pointDeleted = new EventEmitter<number>();
-  @Output() pointMoved = new EventEmitter<{ oldIndex: number; newIndex: number }>();
+  // Inject the State Service directly
+  public routeState = inject(RouteStateService);
 
   // --- Local UI State ---
   public editingIndex: number | null = null;
@@ -50,9 +47,10 @@ export class RoutePointListComponent {
   // --- Edit Logic ---
   public startEdit(index: number): void {
     this.editingIndex = index;
+    const currentPoints = this.routeState.points();
     // Pre-fill the input fields with the current point's data
-    this.editLatitude = this.pointList[index].latitude ?? null;
-    this.editLongitude = this.pointList[index].longitude ?? null;
+    this.editLatitude = currentPoints[index].latitude ?? null;
+    this.editLongitude = currentPoints[index].longitude ?? null;
   }
 
   public cancelEdit(): void {
@@ -62,21 +60,22 @@ export class RoutePointListComponent {
   }
 
   public saveEdit(index: number): void {
+    const currentPoints = this.routeState.points();
     // Construct the new point, maintaining any other properties it might have had
     const modifiedPoint: RoutePointListItem = {
-      ...this.pointList[index],
+      ...currentPoints[index],
       latitude: this.editLatitude,
       longitude: this.editLongitude,
     };
-    // Broadcast the change to the Parent Component
-    this.pointUpdated.emit({ index, updatedPoint: modifiedPoint });
+    // Update the state
+    this.routeState.updatePoint(index, modifiedPoint);
     // Close edit mode
     this.cancelEdit();
   }
 
   // --- Delete Logic ---
   public deletePoint(index: number): void {
-    this.pointDeleted.emit(index);
+    this.routeState.removePoint(index);
     // Close the toolbar so the user doesn't see a glitch as the array shifts
     this.expandedIndex = null;
   }
@@ -84,8 +83,8 @@ export class RoutePointListComponent {
   // --- Move Logic ---
   public movePointUp(index: number): void {
     // Visually UP means moving towards the END of the actual array
-    if (index < this.pointList.length - 1) {
-      this.pointMoved.emit({ oldIndex: index, newIndex: index + 1 });
+    if (index < this.routeState.points().length - 1) {
+      this.routeState.movePoint(index, index + 1);
       // Keep the toolbar open and visually following the item that just moved up
       this.expandedIndex = index + 1;
     }
@@ -94,7 +93,7 @@ export class RoutePointListComponent {
   public movePointDown(index: number): void {
     // Visually DOWN means moving towards the START of the actual array
     if (index > 0) {
-      this.pointMoved.emit({ oldIndex: index, newIndex: index - 1 });
+      this.routeState.movePoint(index, index - 1);
       // Keep the toolbar open and visually following the item that just moved down
       this.expandedIndex = index - 1;
     }
@@ -102,7 +101,10 @@ export class RoutePointListComponent {
 
   // This getter returns a reversed copy of the array, but remembers the real index!
   public get reversedPoints() {
-    return this.pointList.map((point, index) => ({ point: point, originalIndex: index })).reverse();
+    return this.routeState
+      .points()
+      .map((point, index) => ({ point: point, originalIndex: index }))
+      .reverse();
   }
 
   // This getter dynamically checks if the current inputs are valid geographic coordinates

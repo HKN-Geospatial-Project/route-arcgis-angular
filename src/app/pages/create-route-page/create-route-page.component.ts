@@ -10,10 +10,7 @@ import { ClickedCoordinate } from '../../map-library/models/clicked-coordinate.m
 import { CoordinateUtils } from '../../utils/coordinate.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
-import {
-  RoutePointListComponent,
-  RoutePointListItem,
-} from '../../components/route-point-list/route-point-list.component';
+import { RoutePointListComponent } from '../../components/route-point-list/route-point-list.component';
 import { RouteStateService } from '../../map-library/services/route-state.service';
 
 /**
@@ -118,21 +115,6 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Navigates back to the main page. */
   public goBack(): void {
     this.router.navigate(['/main-page']);
-  }
-
-  /** Delegates point edits from the UI list to the global state. */
-  public onListPointEdited(event: { index: number; updatedPoint: RoutePointListItem }) {
-    this.routeState.updatePoint(event.index, event.updatedPoint);
-  }
-
-  /** Delegates point deletion from the UI list to the global state. */
-  public onListPointDeleted(index: number): void {
-    this.routeState.removePoint(index);
-  }
-
-  /** Delegates point reordering from the UI list to the global state. */
-  public onListPointMoved(event: { oldIndex: number; newIndex: number }): void {
-    this.routeState.movePoint(event.oldIndex, event.newIndex);
   }
 
   /** Validates if the current signal values represent a valid geographic coordinate. */
