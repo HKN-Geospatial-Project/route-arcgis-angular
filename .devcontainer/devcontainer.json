@@ -1,6 +1,6 @@
 // .devcontainer/devcontainer.json
 {
-  "name": "Geospatial Angular",
+  "name": "Route ArcGIS Angular",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."

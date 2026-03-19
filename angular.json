@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "GeospatialArcGISAngular": {
+    "route-arcgis-angular": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -57,10 +57,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "GeospatialArcGISAngular:build:production"
+              "buildTarget": "route-arcgis-angular:build:production"
             },
             "development": {
-              "buildTarget": "GeospatialArcGISAngular:build:development"
+              "buildTarget": "route-arcgis-angular:build:development"
             }
           },
           "defaultConfiguration": "development"
