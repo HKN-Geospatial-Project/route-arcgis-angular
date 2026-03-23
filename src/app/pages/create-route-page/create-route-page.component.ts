@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 // Application Core Imports
-import { ClickedCoordinate } from '../../map-library/models/clicked-coordinate.model';
+import { ClickedPointVO } from '../../map-library/models/value-objects/clicked-point.vo';
 import { CoordinateUtils } from '../../utils/coordinate.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
@@ -78,7 +78,7 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Initializes the component by subscribing to map click events. */
   ngOnInit(): void {
     this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
-      (clickedCoordinate: ClickedCoordinate) => {
+      (clickedCoordinate: ClickedPointVO) => {
         this.manualLat.set(clickedCoordinate.latitude);
         this.manualLon.set(clickedCoordinate.longitude);
       },

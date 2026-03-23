@@ -1,8 +1,8 @@
 /**
- * Represents a basic geographic location.
- * This model is used for general purpose coordinate handling within the application.
+ * Represents a basic point.
+ * This model is used for general purpose point handling within the application.
  */
-export interface Coordinates {
+export interface PointVO {
   /**
    * The latitude in decimal degrees.
    */

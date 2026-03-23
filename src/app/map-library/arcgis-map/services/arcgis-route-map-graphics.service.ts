@@ -11,7 +11,7 @@ import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol';
 
 // Application Imports
-import { Coordinates } from '../../models/coordinates.model';
+import { PointVO } from '../../models/value-objects/point.vo';
 import { RouteGraphicsService } from '../../abstract/services/route-map-graphics.service';
 
 /**
@@ -47,7 +47,7 @@ export class ArcGISRouteGraphicsService implements RouteGraphicsService {
    * to ensure perfect synchronization with the global state.
    * @param points - The complete array of coordinates representing the current route.
    */
-  public renderRoute(points: Coordinates[]): void {
+  public renderRoute(points: PointVO[]): void {
     if (!this.view) return;
 
     // 1. Wipe the canvas clean
