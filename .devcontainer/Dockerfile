@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/javascript-node:24-bookworm
 
 # Install the Angular CLI globally
 # This allows you to use 'ng' commands immediately inside the container
-RUN npm install -g @angular/cli@21.1.5
+RUN npm install -g @angular/cli@21.2.3
 
 # Optional: Install git if you need specific version control features inside
 # (The base image usually includes git, but this ensures updates)
