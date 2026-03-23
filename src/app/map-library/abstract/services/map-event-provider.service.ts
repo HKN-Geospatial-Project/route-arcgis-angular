@@ -1,4 +1,4 @@
-import { ClickedCoordinate } from '../../models/clicked-coordinate.model';
+import { ClickedPointVO } from '../../models/value-objects/clicked-point.vo';
 import { Observable } from 'rxjs';
 
 /**
@@ -11,11 +11,11 @@ export abstract class MapEventProviderService {
    * An observable stream that emits the coordinates whenever the map is clicked.
    * Components can subscribe to this stream to react to user interactions on the map.
    */
-  abstract mapClicked$: Observable<ClickedCoordinate>;
+  abstract mapClicked$: Observable<ClickedPointVO>;
 
   /**
    * Broadcasts a map click event to all active subscribers.
    * * @param coordinates - The geographical coordinates (and related metadata) of the clicked location.
    */
-  abstract emitMapClick(coordinates: ClickedCoordinate): void;
+  abstract emitMapClick(coordinates: ClickedPointVO): void;
 }

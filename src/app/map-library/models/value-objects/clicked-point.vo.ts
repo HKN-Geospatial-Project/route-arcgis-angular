@@ -2,7 +2,7 @@
  * Represents data captured specifically during a map click event.
  * It extends basic geographic data with screen-space coordinates (pixels).
  */
-export interface ClickedCoordinate {
+export interface ClickedPointVO {
   /**
    * The geographic latitude where the click occurred.
    */

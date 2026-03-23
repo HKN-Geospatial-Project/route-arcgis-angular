@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 
 // Application Imports
-import { ClickedCoordinate } from '../../models/clicked-coordinate.model';
+import { ClickedPointVO } from '../../models/value-objects/clicked-point.vo';
 import { MapEventProviderService } from '../../abstract/services/map-event-provider.service';
 
 /**
@@ -14,19 +14,19 @@ import { MapEventProviderService } from '../../abstract/services/map-event-provi
 @Injectable()
 export class ArcGISMapEventProviderService implements MapEventProviderService {
   /** Internal Subject that acts as the source of truth for map clicks. */
-  private mapClickSource = new Subject<ClickedCoordinate>();
+  private mapClickSource = new Subject<ClickedPointVO>();
 
   /**
    * Publicly exposed observable derived from the internal Subject.
    * Components subscribe to this to receive real-time coordinate updates.
    */
-  public mapClicked$: Observable<ClickedCoordinate> = this.mapClickSource.asObservable();
+  public mapClicked$: Observable<ClickedPointVO> = this.mapClickSource.asObservable();
 
   /**
    * Pushes a new coordinate payload into the event stream.
    * @param coordinates - The geographic and screen data captured from the ArcGIS MapView.
    */
-  public emitMapClick(coordinates: ClickedCoordinate): void {
+  public emitMapClick(coordinates: ClickedPointVO): void {
     this.mapClickSource.next(coordinates);
   }
 }
