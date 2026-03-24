@@ -1,3 +1,5 @@
+@import 'ngx-toastr/toastr';
+
 /**
  * Global Reset and Base Layout.
  * Ensures the application occupies the full browser window without

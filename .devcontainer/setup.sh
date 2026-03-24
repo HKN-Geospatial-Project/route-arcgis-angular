@@ -4,6 +4,9 @@
 echo "Installing base packages..."
 npm install -g npm@11.12.0
 
+npm install @angular/animations@21.2.5
+npm install ngx-toastr@20.0.5
+
 echo "Installing ArcGIS packages..."
 
 echo "- arcgis/core"

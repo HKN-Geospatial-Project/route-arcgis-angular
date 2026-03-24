@@ -12,6 +12,12 @@
         placeholder="e.g., Morning Run"
         class="text-input"
       />
+
+      @if (nameError) {
+        <small style="color: red">
+          {{ nameError }}
+        </small>
+      }
     </div>
 
     <hr />
@@ -45,7 +51,12 @@
         </div>
       </div>
 
-      <button class="btn-primary" (click)="addManualPoint()" [disabled]="!isManualAddValid">
+      <button
+        class="btn-primary"
+        (click)="addManualPoint()"
+        disabled
+        [disabled]="!isManualAddValid"
+      >
         Add
       </button>
     </div>
@@ -62,8 +73,12 @@
 
     <div class="action-buttons">
       <button class="btn-secondary" (click)="goBack()">Back</button>
-      <button class="btn-danger" (click)="resetRoute()">Reset</button>
-      <button class="btn-success" (click)="saveRoute()">Save Route</button>
+      <button class="btn-danger" (click)="resetRoute()" disabled [disabled]="!canReset">
+        Reset
+      </button>
+      <button class="btn-success" (click)="saveRoute()" disabled [disabled]="!canSave">
+        Save Route
+      </button>
     </div>
   </div>
 </div>
