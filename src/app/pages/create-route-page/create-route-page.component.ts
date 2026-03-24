@@ -145,4 +145,45 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   public get isManualAddValid(): boolean {
     return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
   }
+
+  public get canSave(): boolean {
+    return (
+      this.routeState.points().length >= 2 &&
+      this.routeName.trim().length > 0 &&
+      this.nameError === null
+    );
+  }
+
+  public get canReset(): boolean {
+    return this.routeState.points() && this.routeState.points().length > 0;
+  }
+
+  get nameError(): string | null {
+    const name = this.routeName.trim();
+
+    // If the field is empty, we don't show a specific typing error yet
+    if (name.length === 0) {
+      return null;
+    }
+
+    // Rule 1: Must start with a letter.
+    // The '!' reverses the logic: if it does NOT match a starting letter, return error.
+    if (!/^[a-zA-Z]/.test(name)) {
+      return 'The route name must start with a letter.';
+    }
+
+    // Rule 2: Allowed characters.
+    // This regex looks for anything that is NOT (^) a letter, number, space, or hyphen.
+    if (/[^a-zA-Z0-9 -]/.test(name)) {
+      return 'Only letters, numbers, spaces, and hyphens are allowed.';
+    }
+
+    // Rule 3: Length limits.
+    if (name.length < 3 || name.length > 50) {
+      return 'The name must be between 3 and 50 characters long.';
+    }
+
+    // If it passes all rules, return null (no errors)
+    return null;
+  }
 }
