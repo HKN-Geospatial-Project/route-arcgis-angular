@@ -4,14 +4,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 // Application Core Imports
 import { ClickedPointVO } from '../../map-library/models/value-objects/clicked-point.vo';
 import { CoordinateUtils } from '../../utils/coordinate.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
+import { RouteDataService } from '../../services/route-data-service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
 import { RoutePointListComponent } from '../../components/route-point-list/route-point-list.component';
 import { RouteStateService } from '../../map-library/services/route-state.service';
+import { RoutePointDto as PointDto, RoutePointDto } from '../../models/dtos/route-point.dto';
+import { RoutePointType } from '../../models/enums/route-point-type.enum';
 
 /**
  * Orchestrates the route creation workflow.
@@ -30,8 +34,12 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Service for programmatic page navigation. */
   private router = inject(Router);
 
+  private toastService = inject(ToastrService);
+
   /** Service that broadcasts clicks from the ArcGIS Map component. */
   private mapEventProviderService = inject(MapEventProviderService);
+
+  private routeDataService = inject(RouteDataService);
 
   /** Centralized state manager for the route points. */
   public routeState = inject(RouteStateService);
@@ -104,7 +112,23 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   }
 
   public saveRoute(): void {
-    console.log('saveRoute');
+    const points: RoutePointDto[] = this.routeState.points().map((item) => ({
+      latitude: item.latitude ?? 0.0,
+      longitude: item.longitude ?? 0.0,
+      altitude: 0.0,
+      type: RoutePointType.NOT_DEFINED,
+    }));
+
+    this.routeDataService.save(this.routeName, points).subscribe({
+      next: (response) => {
+        this.toastService.success('Success! Database saved it');
+        console.log('Success! Database saved it:', response);
+      },
+      error: (err) => {
+        this.toastService.error('Uh oh, something went wrong');
+        console.error('Uh oh, something went wrong:', err);
+      },
+    });
   }
 
   /** Wipes the global route state, which triggers the map to clear itself. */

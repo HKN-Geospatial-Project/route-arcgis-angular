@@ -1,6 +1,6 @@
 import { RoutePointDto } from './route-point.dto';
 
-export interface RouteRequest {
+export type RouteRequestDTO = {
   name: string;
   points: RoutePointDto[];
-}
+};

@@ -1,8 +1,8 @@
 import { RoutePointType } from '../enums/route-point-type.enum';
 
-export interface RoutePointDto {
+export type RoutePointDto = {
   latitude: number;
   longitude: number;
-  altitude: number;
+  altitude: number | null;
   type: RoutePointType;
-}
+};
