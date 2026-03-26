@@ -8,7 +8,7 @@ import { RoutePointDto as PointDto } from '../models/dtos/route-point.dto';
   providedIn: 'root',
 })
 export class RouteDataService {
-  private apiUrl = 'http://localhost:8080';
+  private apiUrl = 'http://localhost:8080/public';
 
   constructor(private httpClient: HttpClient) {}
 
