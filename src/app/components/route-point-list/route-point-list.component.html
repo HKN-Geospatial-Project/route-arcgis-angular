@@ -1,8 +1,8 @@
 <div class="scroll-area">
   @for (item of reversedPoints; track item.originalIndex) {
-    <div class="point-card" [class.expanded]="expandedIndex === item.originalIndex">
+    <div class="list-card" [class.expanded]="expandedIndex === item.originalIndex">
       <div class="view-mode header-click" (click)="toggleExpand(item.originalIndex)">
-        <span class="point-title">Point {{ item.originalIndex + 1 }}</span>
+        <span class="list-card-title">Point {{ item.originalIndex + 1 }}</span>
 
         <div class="coords-container">
           @if (editingIndex === item.originalIndex) {

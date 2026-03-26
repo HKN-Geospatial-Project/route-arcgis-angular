@@ -1,0 +1,56 @@
+/* --- Generic List Card Architecture --- */
+
+.scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  /* Ensures the container takes up the available height */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Base Card Styling --- */
+.list-card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.list-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d0d0d0;
+}
+
+/* Active/Expanded State */
+.list-card.expanded {
+  border-left: 4px solid #005e95;
+  box-shadow: 0 4px 12px rgba(0, 94, 149, 0.15);
+}
+
+.list-card-title {
+  font-weight: bold;
+  color: #005e95;
+  display: block;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+/* --- Management Toolbar --- */
+.management-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.action-group {
+  display: flex;
+  gap: 8px;
+}

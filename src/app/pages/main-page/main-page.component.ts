@@ -1,6 +1,7 @@
 /// Angular Core Imports
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { FileListComponent } from '../../components/file-list/file-list.component';
 
 /**
  * The primary entry point of the application.
@@ -9,7 +10,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'main-page',
   standalone: true,
-  imports: [],
+  imports: [FileListComponent],
   templateUrl: './main-page.component.html',
   styleUrl: './main-page.component.css',
 })

@@ -1,0 +1,48 @@
+<div class="page-layout">
+  <div class="sidebar-section">
+    <div class="scroll-area">
+      @for (file of fileList; track file.id) {
+        <div class="list-card" [class.expanded]="expandedFileId === file.id">
+          <div class="view-mode header-click" (click)="toggleExpand(file.id)">
+            <span class="list-card-title">{{ file.name }}</span>
+          </div>
+
+          @if (expandedFileId === file.id) {
+            <div class="management-toolbar">
+              <div></div>
+              <div class="action-group">
+                <button class="btn-outline-primary" (click)="editFile(file.id)">Edit</button>
+                <button class="btn-outline-danger" (click)="promptDelete(file)">Delete</button>
+              </div>
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="empty-msg">No route files found.</p>
+      }
+    </div>
+  </div>
+</div>
+
+@if (showDeleteModal) {
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <h3>Confirm Deletion</h3>
+      <p>
+        Are you sure you want to delete <strong>{{ fileToDelete?.name }}</strong
+        >? This action cannot be undone.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-modern-cancel" (click)="cancelDelete()">Cancel</button>
+        <button
+          class="btn-danger"
+          style="border-radius: 20px; padding: 6px 18px"
+          (click)="confirmDelete()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+}
