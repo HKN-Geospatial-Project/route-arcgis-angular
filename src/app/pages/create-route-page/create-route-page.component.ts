@@ -120,14 +120,8 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     }));
 
     this.routeDataService.save(this.routeName, points).subscribe({
-      next: (response) => {
-        this.toastService.success('Success! Database saved it');
-        console.log('Success! Database saved it:', response);
-      },
-      error: (err) => {
-        this.toastService.error('Uh oh, something went wrong');
-        console.error('Uh oh, something went wrong:', err);
-      },
+      next: (response) => this.toastService.success('Success! Database saved it'),
+      error: (err) => this.toastService.error('Uh oh, something went wrong'),
     });
   }
 
