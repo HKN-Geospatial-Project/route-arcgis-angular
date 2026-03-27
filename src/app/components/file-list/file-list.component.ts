@@ -34,6 +34,12 @@ export class FileListComponent {
   @Input() fileList: FileItem[] = [];
 
   /**
+   * Indicates if an external process (like a deletion) is currently loading.
+   * Used to disable buttons and show spinners in the UI.
+   */
+  @Input() isLoading: boolean = false;
+
+  /**
    * Event emitted when a file is selected (expanded) or deselected (collapsed).
    * Emits the `FileItem` object if a file is selected, or `null` if deselected.
    */

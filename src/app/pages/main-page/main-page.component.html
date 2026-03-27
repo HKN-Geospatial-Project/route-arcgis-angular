@@ -5,6 +5,7 @@
     <div class="file-list-container">
       <component-file-list
         [fileList]="routeList()"
+        [isLoading]="isDeleting()"
         (fileEdited)="onEditFileEvent($event)"
         (fileDeleted)="onDeleteFileEvent($event)"
         (fileSelected)="onSelectFileEvent($event)"

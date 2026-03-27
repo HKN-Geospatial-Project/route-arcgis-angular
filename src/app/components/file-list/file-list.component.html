@@ -10,7 +10,18 @@
           <div></div>
           <div class="action-group">
             <button class="btn-outline-primary" (click)="editFile(file)">Edit</button>
-            <button class="btn-outline-danger" (click)="promptDelete(file)">Delete</button>
+            <button
+              class="btn-outline-danger"
+              (click)="promptDelete(file)"
+              [disabled]="isLoading"
+              style="display: flex; align-items: center; justify-content: center; min-width: 100px"
+            >
+              @if (isLoading) {
+                <span class="spinner"></span>
+              } @else {
+                Delete
+              }
+            </button>
           </div>
         </div>
       }
