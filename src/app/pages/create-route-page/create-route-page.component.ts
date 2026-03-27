@@ -28,17 +28,21 @@ import { RoutePointType } from '../../models/enums/route-point-type.enum';
   styleUrls: ['./create-route-page.component.css'],
 })
 export class CreateRoutePageComponent implements OnInit, OnDestroy {
+  // --- Dependencies ---
+
   /** Subscription to the global map click event stream. Must be cleaned up on destroy. */
   private clickSubscription!: Subscription;
 
   /** Service for programmatic page navigation. */
   private router = inject(Router);
 
+  /** Service used to display success or error notification toasts. */
   private toastService = inject(ToastrService);
 
   /** Service that broadcasts clicks from the ArcGIS Map component. */
   private mapEventProviderService = inject(MapEventProviderService);
 
+  /** Service responsible for persisting route data to the backend. */
   private routeDataService = inject(RouteDataService);
 
   /** Centralized state manager for the route points. */
@@ -83,8 +87,11 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Initializes the component by subscribing to map click events. */
+  /**
+   * Lifecycle hook that initializes the component by subscribing to map click events.
+   */
   ngOnInit(): void {
+    /** When the user clicks the map, the coordinates automatically populate the manual input signals. */
     this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
       (clickedCoordinate: ClickedPointVO) => {
         this.manualLat.set(clickedCoordinate.latitude);
@@ -111,6 +118,9 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Finalizes the route creation process.
+   */
   public saveRoute(): void {
     const points: RoutePointDto[] = this.routeState.points().map((item) => ({
       latitude: item.latitude ?? 0.0,
@@ -140,6 +150,11 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
   }
 
+  /**
+   * Evaluates if the entire route is valid and ready to be saved to the database.
+   * Requires at least two points (to form a line) and a valid route name.
+   * @returns True if the route can be saved, false otherwise.
+   */
   public get canSave(): boolean {
     return (
       this.routeState.points().length >= 2 &&
@@ -148,10 +163,18 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Evaluates if there is any active route data that can be reset.
+   * @returns True if there is at least one point in the state, false otherwise.
+   */
   public get canReset(): boolean {
     return this.routeState.points() && this.routeState.points().length > 0;
   }
 
+  /**
+   * Validates the currently typed route name against formatting and length rules.
+   * @returns An error message string if a rule is violated, or `null` if the name is valid or empty.
+   */
   get nameError(): string | null {
     const name = this.routeName.trim();
 
