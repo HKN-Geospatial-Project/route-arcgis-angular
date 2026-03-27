@@ -1,10 +1,10 @@
-import { Component, Input, Output, EventEmitter, output } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
  * Represents a file entity containing basic metadata.
  */
-interface FileItem {
+export interface FileItem {
   /** The unique identifier for the file. */
   id: string;
   /** The display name of the file (e.g., 'Alpha.json'). */
@@ -25,10 +25,19 @@ interface FileItem {
   styleUrls: ['./file-list.component.css'],
 })
 export class FileListComponent {
+  /** Angular Router service used for programmatic navigation between pages. */
+  private router = inject(Router);
+
   /**
    * The list of files to be displayed.
    */
   @Input() fileList: FileItem[] = [];
+
+  /**
+   * Indicates if an external process (like a deletion) is currently loading.
+   * Used to disable buttons and show spinners in the UI.
+   */
+  @Input() isLoading: boolean = false;
 
   /**
    * Event emitted when a file is selected (expanded) or deselected (collapsed).
@@ -56,12 +65,6 @@ export class FileListComponent {
 
   /** Stores the ID of the currently expanded file card. Null if no card is expanded. */
   expandedFileId: string | null = null;
-
-  /**
-   * Initializes the FileListComponent.
-   * * @param router - The Angular Router service used for navigating between pages.
-   */
-  constructor(private router: Router) {}
 
   /**
    * Toggles the expansion state of a file card and emits the selection status.

@@ -3,13 +3,19 @@
     <h2>Route Files</h2>
 
     <div class="file-list-container">
-      <component-file-list></component-file-list>
+      <component-file-list
+        [fileList]="routeList()"
+        [isLoading]="isDeleting()"
+        (fileEdited)="onEditFileEvent($event)"
+        (fileDeleted)="onDeleteFileEvent($event)"
+        (fileSelected)="onSelectFileEvent($event)"
+      ></component-file-list>
     </div>
 
     <hr />
 
     <div class="action-buttons">
-      <button class="btn-primary" (click)="navigateCreateRoutePage()">Create Route</button>
+      <button class="btn-primary" (click)="onCreateRouteButtonPressedEvent()">Create Route</button>
     </div>
   </div>
 </div>
