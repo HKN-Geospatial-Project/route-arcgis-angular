@@ -12,8 +12,7 @@ export class RouteDataService {
 
   constructor(private httpClient: HttpClient) {}
 
-  save(name: string, points: PointDto[]) {
-    console.log(name + '; ' + points);
+  create(name: string, points: PointDto[]) {
     return this.httpClient.post<RouteResponseDTO>(this.apiUrl + '/routes', { name, points }).pipe(
       tap((value) => {
         sessionStorage.setItem('id', value.id.toString());
@@ -21,5 +20,9 @@ export class RouteDataService {
         sessionStorage.setItem('points', JSON.stringify(value.points));
       }),
     );
+  }
+
+  getAllRoutes() {
+    return this.httpClient.get<RouteResponseDTO[]>(this.apiUrl + '/routes');
   }
 }
