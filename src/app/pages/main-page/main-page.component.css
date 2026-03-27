@@ -2,3 +2,12 @@
  * Page default styles.
  */
 @import "../../../styles/page-styles.css";
+
+/**
+ * Expands to fill available vertical space, pushing everything below it
+ * to the bottom of the sidebar.
+ */
+.file-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}

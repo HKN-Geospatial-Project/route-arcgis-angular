@@ -1,0 +1,57 @@
+# ==========================================================================
+# 1. Default Behavior
+# Auto-detect text files and strictly enforce LF (Linux) line endings.
+# This is CRITICAL for DevContainers to work seamlessly on Windows hosts.
+# ==========================================================================
+* text=auto eol=lf
+
+# ==========================================================================
+# 2. Dev Environment & VS Code
+# ==========================================================================
+.devcontainer/* text eol=lf
+.vscode/* text eol=lf
+.editorconfig text eol=lf
+.gitignore text eol=lf
+
+# ==========================================================================
+# 3. Angular & Node Ecosystem
+# ==========================================================================
+*.ts text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+angular.json text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+tsconfig.*.json text eol=lf
+
+# ==========================================================================
+# 4. Scripts
+# ==========================================================================
+# Bash scripts MUST have LF to execute properly inside Linux/DevContainers
+*.sh text eol=lf
+
+# Windows batch files MUST have CRLF to execute properly on the host OS
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ==========================================================================
+# 5. Binary Files (ArcGIS assets, icons, fonts)
+# Prevent Git from touching line endings in binary files, which corrupts them.
+# ==========================================================================
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

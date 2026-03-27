@@ -25,11 +25,4 @@
   overflow: hidden;
 }
 
-/** * Fixed footer for action buttons using space-between for alignment. */
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  gap: 10px;
-}
-.action-buttons button { flex: 1; }
+
