@@ -82,7 +82,7 @@ export class MainPageComponent implements OnInit {
    * @param item - The file object targeted for editing.
    */
   public onEditFileEvent(item: FileItem): void {
-    console.log('Navigate to Edit Page: ' + item.id);
+    this.router.navigate(['/edit-route-page']);
   }
 
   /**
