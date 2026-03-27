@@ -26,10 +26,13 @@
       },
       // Essential extensions for Angular development
       "extensions": [
-        "Angular.ng-template",      // Angular Language Service
-        "dbaeumer.vscode-eslint",   // ESLint
-        "esbenp.prettier-vscode",   // Prettier
-        "editorconfig.editorconfig" // EditorConfig
+        "Angular.ng-template",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "editorconfig.editorconfig",
+        "johnpapa.Angular2",
+        "infinity1207.angular2-switcher",
+        "formulahendry.auto-rename-tag"
       ]
     }
   },

@@ -1,0 +1,45 @@
+@import "../../../styles/list-cards.css";
+
+/**
+ * Full-screen overlay that dims the background behind the modal.
+ * Uses Flexbox to perfectly center the modal content on the screen.
+ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/**
+ * The main container for the modal content.
+ * Features a clean white background, rounded corners, and a drop shadow for elevation.
+ */
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/** Styling for the descriptive text inside the modal. */
+.modal-content p {
+  color: #555;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/** Container for modal buttons, aligned to the right edge. */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

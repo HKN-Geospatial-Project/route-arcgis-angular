@@ -1,0 +1,79 @@
+/* ==========================================================================
+   Generic List Card Architecture (list-cards.css)
+   (Shared styles used across multiple components like file-list and point-list)
+   ========================================================================== */
+
+/**
+ * Scrollable container for a list of cards.
+ * Uses flex-grow to fill available space and handles internal scrolling.
+ */
+.scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  /* Ensures the container takes up the available height */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Base Card Styling --- */
+
+/**
+ * The fundamental style for a list item card.
+ * Includes a subtle border, shadow, and transition effects for interactivity.
+ */
+.list-card {
+  background: white;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+/** Hover state to provide visual feedback to the user. */
+.list-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #d0d0d0;
+}
+
+/** * Active/Expanded State.
+ * Applies a distinct visual indicator (blue left border and deeper shadow)
+ * when the card is currently selected or expanded.
+ */
+.list-card.expanded {
+  border-left: 4px solid #005e95;
+  box-shadow: 0 4px 12px rgba(0, 94, 149, 0.15);
+}
+
+/** Title text formatting inside the card. */
+.list-card-title {
+  font-weight: bold;
+  color: #005e95;
+  display: block;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+/* --- Management Toolbar --- */
+
+/**
+ * Container for action buttons inside an expanded card.
+ * Separated from the content above by a subtle top border.
+ */
+.management-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+/** Groups related action buttons together with consistent spacing. */
+.action-group {
+  display: flex;
+  gap: 8px;
+}

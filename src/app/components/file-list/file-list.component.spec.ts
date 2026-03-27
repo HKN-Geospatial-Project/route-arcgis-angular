@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateRoutePageComponent } from './create-route-page.component';
+import { FileListComponent } from './file-list.component';
 
-describe('CreateRoutePageComponent', () => {
-  let component: CreateRoutePageComponent;
-  let fixture: ComponentFixture<CreateRoutePageComponent>;
+describe('FileListComponent', () => {
+  let component: FileListComponent;
+  let fixture: ComponentFixture<FileListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateRoutePageComponent]
+      imports: [FileListComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CreateRoutePageComponent);
+    fixture = TestBed.createComponent(FileListComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
