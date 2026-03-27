@@ -6,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 // Application Core Imports
 import { FileListComponent, FileItem } from '../../components/file-list/file-list.component';
 import { RouteDataService } from '../../services/route-data-service';
+import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
 
 /**
  * The primary entry point of the application.
@@ -29,6 +30,9 @@ export class MainPageComponent implements OnInit {
 
   /** Service responsible for persisting route data to the backend. */
   private routeDataService = inject(RouteDataService);
+
+  /** Centralized state manager for the route points. */
+  public routeGraphicsService = inject(RouteGraphicsService);
 
   // --- State Variables ---
 
@@ -78,7 +82,7 @@ export class MainPageComponent implements OnInit {
    * @param item - The file object targeted for editing.
    */
   public onEditFileEvent(item: FileItem): void {
-    console.log('Navigate to Edit Page: ' + item.id);
+    this.router.navigate(['/edit-route-page']);
   }
 
   /**
@@ -91,6 +95,7 @@ export class MainPageComponent implements OnInit {
 
     this.routeDataService.delete(item.id).subscribe({
       next: () => {
+        this.routeGraphicsService.clearAll();
         // We filter the current list to remove the deleted ID
         const updatedList = this.routeList().filter((f) => f.id !== item.id);
         this.routeList.set(updatedList);
@@ -110,9 +115,22 @@ export class MainPageComponent implements OnInit {
    */
   public onSelectFileEvent(item: FileItem | null): void {
     if (item) {
-      console.log('Selected file: ' + item.id);
+      this.routeDataService.getById(item.id).subscribe({
+        next: (response) => {
+          const mappedPoints = response.points.map((item) => ({
+            latitude: item.latitude,
+            longitude: item.longitude,
+            altitude: item.altitude,
+          }));
+          this.routeGraphicsService.renderRoute(mappedPoints);
+        },
+        error: (err) => {
+          this.routeGraphicsService.clearAll();
+          this.toastService.error('Uh oh, something went wrong');
+        },
+      });
     } else {
-      console.log('No file selected');
+      this.routeGraphicsService.clearAll();
     }
   }
 }
