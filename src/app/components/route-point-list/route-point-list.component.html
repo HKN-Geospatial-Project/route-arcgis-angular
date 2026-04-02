@@ -68,7 +68,7 @@
               <button
                 class="btn-icon"
                 (click)="movePointUp(item.originalIndex)"
-                [disabled]="item.originalIndex === routeState.points().length - 1"
+                [disabled]="item.originalIndex === pointList.length - 1"
                 title="Move Up"
               >
                 ⬆️
