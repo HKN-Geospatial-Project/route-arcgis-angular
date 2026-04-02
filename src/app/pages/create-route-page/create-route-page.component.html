@@ -66,7 +66,12 @@
     <div class="points-list-container">
       <h3>Route Points ({{ routeState.points().length }})</h3>
 
-      <component-route-point-list></component-route-point-list>
+      <component-route-point-list
+        [pointList]="routeState.points()"
+        (pointUpdated)="onListPointUpdated($event)"
+        (pointDeleted)="onListPointDeleted($event)"
+        (pointMoved)="onListPointMoved($event)"
+      ></component-route-point-list>
     </div>
 
     <hr />

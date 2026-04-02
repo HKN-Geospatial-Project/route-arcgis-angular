@@ -12,9 +12,12 @@ import { CoordinateUtils } from '../../utils/coordinate.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
 import { RouteDataService } from '../../services/route-data-service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
-import { RoutePointListComponent } from '../../components/route-point-list/route-point-list.component';
+import {
+  RoutePointListComponent,
+  RoutePointListItem,
+} from '../../components/route-point-list/route-point-list.component';
 import { RouteStateService } from '../../map-library/services/route-state.service';
-import { RoutePointDto as PointDto, RoutePointDto } from '../../models/dtos/route-point.dto';
+import { RoutePointDto } from '../../models/dtos/route-point.dto';
 import { RoutePointType } from '../../models/enums/route-point-type.enum';
 
 /**
@@ -87,9 +90,7 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Lifecycle hook that initializes the component by subscribing to map click events.
-   */
+  /** Lifecycle hook: Initializes map listeners when the component mounts. */
   ngOnInit(): void {
     /** When the user clicks the map, the coordinates automatically populate the manual input signals. */
     this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
@@ -100,17 +101,14 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** Unsubscribes from map events to prevent memory leaks. */
+  /** Lifecycle hook: Cleans up RxJS subscriptions to prevent memory leaks. */
   ngOnDestroy(): void {
     if (this.clickSubscription) {
       this.clickSubscription.unsubscribe();
     }
   }
 
-  /**
-   * Pushes the current manual input values into the global RouteState.
-   * Note: The map rendering is handled automatically by the effect().
-   */
+  /** Pushes the coordinates currently in the manual input fields into the global RouteState. */
   public addManualPoint(): void {
     this.routeState.addPoint({
       latitude: this.manualLat(),
@@ -118,9 +116,7 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Finalizes the route creation process.
-   */
+  /** Finalizes the route creation process. */
   public saveRoute(): void {
     const points: RoutePointDto[] = this.routeState.points().map((item) => ({
       latitude: item.latitude ?? 0.0,
@@ -145,7 +141,26 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
     this.router.navigate(['/main-page']);
   }
 
-  /** Validates if the current signal values represent a valid geographic coordinate. */
+  // --- Sub-component Event Handlers ---
+
+  /** Updates a specific point in the global state when edited in the UI list. */
+  public onListPointUpdated(event: { index: number; updatedPoint: RoutePointListItem }) {
+    this.routeState.updatePoint(event.index, event.updatedPoint);
+  }
+
+  /** Removes a point from the global state when deleted from the UI list. */
+  public onListPointDeleted(index: number): void {
+    this.routeState.removePoint(index);
+  }
+
+  /** Reorders a point in the global state when moved in the UI list. */
+  public onListPointMoved(event: { oldIndex: number; newIndex: number }): void {
+    this.routeState.movePoint(event.oldIndex, event.newIndex);
+  }
+
+  // --- Computed Validation Properties ---
+
+  /** Checks if the current manual coordinates are mathematically valid. */
   public get isManualAddValid(): boolean {
     return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
   }
