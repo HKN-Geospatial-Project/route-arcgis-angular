@@ -6,15 +6,15 @@ export interface ClickedPointVO {
   /**
    * The geographic latitude where the click occurred.
    */
-  latitude: number | null | undefined;
+  latitude: number | null;
   /**
    * The geographic longitude where the click occurred.
    */
-  longitude: number | null | undefined;
+  longitude: number | null;
   /**
    * The calculated elevation at the clicked point.
    */
-  altitude: number | undefined;
+  altitude: number | null;
   /**
    * The horizontal screen coordinate (in pixels) relative to the top-left corner of the map view.
    */
