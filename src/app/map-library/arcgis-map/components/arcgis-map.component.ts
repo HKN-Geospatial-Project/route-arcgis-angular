@@ -74,9 +74,9 @@ export class ArcgisMapComponent implements OnInit, OnDestroy {
 
         // Bundle all the data into our interface payload
         const payload: ClickedPointVO = {
-          latitude: event.mapPoint.latitude ?? undefined,
-          longitude: event.mapPoint.longitude ?? undefined,
-          altitude: elevation !== undefined ? elevation : undefined,
+          latitude: event.mapPoint.latitude != null ? event.mapPoint.latitude : null,
+          longitude: event.mapPoint.longitude != null ? event.mapPoint.longitude : null,
+          altitude: elevation != null ? elevation : null,
           x: event.x,
           y: event.y,
         };

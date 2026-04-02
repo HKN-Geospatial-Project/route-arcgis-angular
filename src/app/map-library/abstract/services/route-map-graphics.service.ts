@@ -1,4 +1,4 @@
-import { PointVO } from '../../models/value-objects/point.vo';
+import { RoutePointVO } from '../../models/value-objects/route-point.vo';
 
 /**
  * Abstract service responsible for managing and rendering Route graphical
@@ -21,7 +21,7 @@ export abstract class RouteGraphicsService {
    * Redraws the entire route based on a provided array of coordinates.
    * @param points - The complete, ordered collection of points to be rendered.
    */
-  abstract renderRoute(points: PointVO[]): void;
+  abstract renderRoute(points: RoutePointVO[]): void;
 
   /**
    * Removes all drawn graphics from the route layer,

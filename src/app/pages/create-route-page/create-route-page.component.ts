@@ -9,6 +9,8 @@ import { ToastrService } from 'ngx-toastr';
 // Application Core Imports
 import { ClickedPointVO } from '../../map-library/models/value-objects/clicked-point.vo';
 import { CoordinateUtils } from '../../utils/coordinate.utils';
+import { DataMapConversionUtils } from '../../utils/data-map-conversion.utils';
+import { DTORouteConversionUtils } from '../../utils/dto-route-conversion.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
 import { RouteDataService } from '../../services/route-data-service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
@@ -17,8 +19,6 @@ import {
   RoutePointListItem,
 } from '../../components/route-point-list/route-point-list.component';
 import { RouteStateService } from '../../map-library/services/route-state.service';
-import { RoutePointDto } from '../../models/dtos/route-point.dto';
-import { RoutePointType } from '../../models/enums/route-point-type.enum';
 
 /**
  * Orchestrates the route creation workflow.
@@ -49,7 +49,9 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   private routeDataService = inject(RouteDataService);
 
   /** Centralized state manager for the route points. */
-  public routeState = inject(RouteStateService);
+  private routeState = inject(RouteStateService);
+
+  public routePointList = signal<RoutePointListItem[]>([]);
 
   // --- State Variables ---
 
@@ -57,10 +59,10 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   public routeName: string = '';
 
   /** Reactive Signal for the latitude input field. */
-  public manualLat = signal<number | null | undefined>(null);
+  public manualLat = signal<number | null>(null);
 
   /** Reactive Signal for the longitude input field. */
-  public manualLon = signal<number | null | undefined>(null);
+  public manualLon = signal<number | null>(null);
 
   /**
    * Initializes the component and sets up the reactive rendering effect.
@@ -79,13 +81,14 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
 
       if (currentPoints.length === 0) {
         this.routeService.clearAll();
+        this.routePointList.set([]);
       } else {
-        // Map the array to explicitly define missing properties (like altitude)
-        const mappedPoints = currentPoints.map((pt) => ({
-          ...pt,
-          altitude: undefined,
-        }));
-        this.routeService.renderRoute(mappedPoints);
+        const mappedPoints =
+          DataMapConversionUtils.convertListRoutePointVOToRoutePointListItem(currentPoints);
+
+        this.routePointList.set(mappedPoints);
+
+        this.routeService.renderRoute(currentPoints);
       }
     });
   }
@@ -110,20 +113,16 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
 
   /** Pushes the coordinates currently in the manual input fields into the global RouteState. */
   public addManualPoint(): void {
-    this.routeState.addPoint({
-      latitude: this.manualLat(),
-      longitude: this.manualLon(),
-    });
+    this.routeState.addPoint(
+      DataMapConversionUtils.convertToRoutePointVO(this.manualLat(), this.manualLon()),
+    );
   }
 
   /** Finalizes the route creation process. */
   public saveRoute(): void {
-    const points: RoutePointDto[] = this.routeState.points().map((item) => ({
-      latitude: item.latitude ?? 0.0,
-      longitude: item.longitude ?? 0.0,
-      altitude: 0.0,
-      type: RoutePointType.NOT_DEFINED,
-    }));
+    const points = DTORouteConversionUtils.convertListRoutePointVOToRoutePointDTO(
+      this.routeState.points(),
+    );
 
     this.routeDataService.create(this.routeName, points).subscribe({
       next: (response) => this.toastService.success('Success! Database saved it'),
@@ -145,7 +144,11 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
 
   /** Updates a specific point in the global state when edited in the UI list. */
   public onListPointUpdated(event: { index: number; updatedPoint: RoutePointListItem }) {
-    this.routeState.updatePoint(event.index, event.updatedPoint);
+    const tmpPoint = DataMapConversionUtils.convertRoutePointListItemToRoutePointVO(
+      event.updatedPoint,
+    );
+
+    this.routeState.updatePoint(event.index, tmpPoint);
   }
 
   /** Removes a point from the global state when deleted from the UI list. */
@@ -162,7 +165,13 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
 
   /** Checks if the current manual coordinates are mathematically valid. */
   public get isManualAddValid(): boolean {
-    return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
+    if (this.manualLat() === null || this.manualLon() === null) {
+      return false;
+    }
+    return CoordinateUtils.isValidGeographicCoordinate(
+      this.manualLat() as number,
+      this.manualLon() as number,
+    );
   }
 
   /**
