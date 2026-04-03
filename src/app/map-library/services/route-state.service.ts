@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { RoutePointListItem } from '../../components/route-point-list/route-point-list.component';
+import { RoutePointVO } from '../models/value-objects/route-point.vo';
 
 /**
  * The Single Source of Truth for the route currently being built.
@@ -15,7 +15,7 @@ export class RouteStateService {
    * Keeping it private prevents external components from mutating the array directly,
    * enforcing a unidirectional data flow.
    */
-  private readonly _points = signal<RoutePointListItem[]>([]);
+  private readonly _points = signal<RoutePointVO[]>([]);
 
   /**
    * Publicly exposed, read-only version of the signal.
@@ -24,13 +24,13 @@ export class RouteStateService {
   public readonly points = this._points.asReadonly();
 
   /** Appends a new coordinate point to the end of the route array. */
-  public addPoint(point: RoutePointListItem): void {
+  public addPoint(point: RoutePointVO): void {
     // .update() provides the current array so we can return a new one safely
     this._points.update((current) => [...current, point]);
   }
 
   /** Updates an existing point's data at a specific index. */
-  public updatePoint(index: number, updatedPoint: RoutePointListItem): void {
+  public updatePoint(index: number, updatedPoint: RoutePointVO): void {
     this._points.update((current) => {
       const newArray = [...current];
       newArray[index] = updatedPoint;

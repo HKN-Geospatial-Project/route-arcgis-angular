@@ -8,8 +8,8 @@ import { CoordinateUtils } from '../../utils/coordinate.utils';
  * Interface representing a single point in the route list.
  */
 export interface RoutePointListItem {
-  latitude: number | null | undefined;
-  longitude: number | null | undefined;
+  latitude: number;
+  longitude: number;
 }
 
 /**
@@ -76,8 +76,8 @@ export class RoutePointListComponent {
   public startEdit(index: number): void {
     this.editingIndex = index;
     // Pre-fill the input fields with the current point's data
-    this.editLatitude = this.pointList[index].latitude ?? null;
-    this.editLongitude = this.pointList[index].longitude ?? null;
+    this.editLatitude = this.pointList[index].latitude;
+    this.editLongitude = this.pointList[index].longitude;
   }
 
   /**
@@ -94,16 +94,21 @@ export class RoutePointListComponent {
    * @param index - The original array index of the point being saved.
    */
   public saveEdit(index: number): void {
-    // Construct the new point, maintaining any other properties it might have had
-    const modifiedPoint: RoutePointListItem = {
-      ...this.pointList[index],
-      latitude: this.editLatitude,
-      longitude: this.editLongitude,
-    };
-    // Broadcast the change to the Parent Component
-    this.pointUpdated.emit({ index, updatedPoint: modifiedPoint });
-    // Close edit mode
-    this.cancelEdit();
+    if (this.editLatitude != null && this.editLongitude != null) {
+      // Construct the new point, maintaining any other properties it might have had
+      const modifiedPoint: RoutePointListItem = {
+        latitude: this.editLatitude,
+        longitude: this.editLongitude,
+      };
+      // Broadcast the change to the Parent Component
+      this.pointUpdated.emit({ index, updatedPoint: modifiedPoint });
+      // Close edit mode
+      this.cancelEdit();
+    } else {
+      throw new Error(
+        `Critical Error: Failed to create RoutePointListItem. Coordinates cannot be null or undefined. Received latitude: ${this.editLatitude}, longitude: ${this.editLongitude}.`,
+      );
+    }
   }
 
   // --- Delete Logic ---
@@ -163,6 +168,10 @@ export class RoutePointListComponent {
    * Validates whether the currently typed coordinates in edit mode are geographically valid.
    */
   public get isEditValid(): boolean {
-    return CoordinateUtils.isValidGeographicCoordinate(this.editLatitude, this.editLongitude);
+    return (
+      this.editLatitude != null &&
+      this.editLongitude != null &&
+      CoordinateUtils.isValidGeographicCoordinate(this.editLatitude, this.editLongitude)
+    );
   }
 }

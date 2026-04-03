@@ -1,14 +1,15 @@
 // Angular Core Imports
-import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
+import { Component, OnDestroy, inject, signal, effect, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 // Application Core Imports
-import { ClickedPointVO } from '../../map-library/models/value-objects/clicked-point.vo';
+import { ClickedPointEvent } from '../../map-library/models/event/clicked-point.event';
 import { CoordinateUtils } from '../../utils/coordinate.utils';
+import { DataMapConversionUtils } from '../../utils/data-map-conversion.utils';
 import { MapEventProviderService } from '../../map-library/abstract/services/map-event-provider.service';
 import { RouteDataService } from '../../services/route-data-service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
@@ -16,8 +17,7 @@ import {
   RoutePointListComponent,
   RoutePointListItem,
 } from '../../components/route-point-list/route-point-list.component';
-import { RouteStateService } from '../../map-library/services/route-state.service';
-import { RoutePointDto } from '../../models/dtos/route-point.dto';
+import { RoutePointListUtils } from '../../components/route-point-list/route-point-list.utils';
 import { RoutePointType } from '../../models/enums/route-point-type.enum';
 
 /**
@@ -30,11 +30,8 @@ import { RoutePointType } from '../../models/enums/route-point-type.enum';
   templateUrl: './create-route-page.component.html',
   styleUrls: ['./create-route-page.component.css'],
 })
-export class CreateRoutePageComponent implements OnInit, OnDestroy {
+export class CreateRoutePageComponent implements OnDestroy {
   // --- Dependencies ---
-
-  /** Subscription to the global map click event stream. Must be cleaned up on destroy. */
-  private clickSubscription!: Subscription;
 
   /** Service for programmatic page navigation. */
   private router = inject(Router);
@@ -48,92 +45,96 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Service responsible for persisting route data to the backend. */
   private routeDataService = inject(RouteDataService);
 
-  /** Centralized state manager for the route points. */
-  public routeState = inject(RouteStateService);
+  /** Service responsible for drawing graphics on the map. */
+  private routeService = inject(RouteGraphicsService);
 
   // --- State Variables ---
 
   /** The user-defined name for the route being created. */
-  public routeName: string = '';
+  public routeName = signal<string>('');
 
   /** Reactive Signal for the latitude input field. */
-  public manualLat = signal<number | null | undefined>(null);
+  public manualLat = signal<number | null>(null);
 
   /** Reactive Signal for the longitude input field. */
-  public manualLon = signal<number | null | undefined>(null);
+  public manualLon = signal<number | null>(null);
+
+  /** Reactive Signal holding the list of formatted points to be displayed in the UI. */
+  public routePointList = signal<RoutePointListItem[]>([]);
 
   /**
    * Initializes the component and sets up the reactive rendering effect.
-   * @param routeService - Service responsible for drawing graphics on the map.
    */
-  constructor(private routeService: RouteGraphicsService) {
+  constructor() {
     /**
      * THE REACTIVE ENGINE:
-     * This effect automatically watches the `routeState.points()` signal.
+     * This effect automatically watches the `routePointList` signal.
      * Whenever a point is added, moved, or deleted from anywhere in the app,
      * this effect fires, transforms the data to satisfy strict interfaces,
      * and forces the map to redraw instantly.
      */
     effect(() => {
-      const currentPoints = this.routeState.points(); // Read the signal
+      const currentPoints = this.routePointList(); // Read the signal
 
       if (currentPoints.length === 0) {
         this.routeService.clearAll();
       } else {
-        // Map the array to explicitly define missing properties (like altitude)
-        const mappedPoints = currentPoints.map((pt) => ({
-          ...pt,
-          altitude: undefined,
-        }));
+        const mappedPoints =
+          DataMapConversionUtils.convertListRoutePointListItemToRoutePointVO(currentPoints);
+
         this.routeService.renderRoute(mappedPoints);
       }
     });
-  }
 
-  /** Lifecycle hook: Initializes map listeners when the component mounts. */
-  ngOnInit(): void {
     /** When the user clicks the map, the coordinates automatically populate the manual input signals. */
-    this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
-      (clickedCoordinate: ClickedPointVO) => {
+    this.mapEventProviderService.mapClicked$
+      .pipe(takeUntilDestroyed())
+      .subscribe((clickedCoordinate: ClickedPointEvent) => {
         this.manualLat.set(clickedCoordinate.latitude);
         this.manualLon.set(clickedCoordinate.longitude);
-      },
-    );
+      });
   }
 
-  /** Lifecycle hook: Cleans up RxJS subscriptions to prevent memory leaks. */
+  /** Lifecycle hook: Custom cleanup */
   ngOnDestroy(): void {
-    if (this.clickSubscription) {
-      this.clickSubscription.unsubscribe();
-    }
+    this.routeService.clearAll();
   }
 
-  /** Pushes the coordinates currently in the manual input fields into the global RouteState. */
+  // --- Core Actions ---
+
+  /** Pushes the coordinates currently in the manual input fields into the route list. */
   public addManualPoint(): void {
-    this.routeState.addPoint({
-      latitude: this.manualLat(),
-      longitude: this.manualLon(),
-    });
+    const newPoint = RoutePointListUtils.createRoutePointListItem(
+      this.manualLat(),
+      this.manualLon(),
+    );
+    this.routePointList.update((current) => [...current, newPoint]);
   }
 
   /** Finalizes the route creation process. */
   public saveRoute(): void {
-    const points: RoutePointDto[] = this.routeState.points().map((item) => ({
-      latitude: item.latitude ?? 0.0,
-      longitude: item.longitude ?? 0.0,
-      altitude: 0.0,
+    const dtoList = this.routePointList().map((item) => ({
+      latitude: item.latitude,
+      longitude: item.longitude,
+      altitude: null,
       type: RoutePointType.NOT_DEFINED,
     }));
 
-    this.routeDataService.create(this.routeName, points).subscribe({
-      next: (response) => this.toastService.success('Success! Database saved it'),
-      error: (err) => this.toastService.error('Uh oh, something went wrong'),
+    this.routeDataService.create(this.routeName(), dtoList).subscribe({
+      next: (response) => {
+        console.log(response);
+        this.toastService.success('Success! Database saved it');
+      },
+      error: (err) => {
+        console.log(err);
+        this.toastService.error('Uh oh, something went wrong');
+      },
     });
   }
 
-  /** Wipes the global route state, which triggers the map to clear itself. */
+  /** Wipes the route list, which triggers the map to clear itself. */
   public resetRoute(): void {
-    this.routeState.clearRoute();
+    this.routePointList.set([]);
   }
 
   /** Navigates back to the main page. */
@@ -143,79 +144,81 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
 
   // --- Sub-component Event Handlers ---
 
-  /** Updates a specific point in the global state when edited in the UI list. */
+  /** Updates a specific point in the route list when edited in the UI list. */
   public onListPointUpdated(event: { index: number; updatedPoint: RoutePointListItem }) {
-    this.routeState.updatePoint(event.index, event.updatedPoint);
+    // Reassigning the array triggers the Map to redraw automatically!
+    this.routePointList.update((current) => {
+      const newArray = [...current];
+      newArray[event.index] = event.updatedPoint;
+      return newArray;
+    });
   }
 
-  /** Removes a point from the global state when deleted from the UI list. */
+  /** Removes a point from the route list when deleted from the UI list. */
   public onListPointDeleted(index: number): void {
-    this.routeState.removePoint(index);
+    this.routePointList.update((current) => current.filter((_, i) => i !== index));
   }
 
-  /** Reorders a point in the global state when moved in the UI list. */
+  /** Reorders a point in the route list when moved in the UI list. */
   public onListPointMoved(event: { oldIndex: number; newIndex: number }): void {
-    this.routeState.movePoint(event.oldIndex, event.newIndex);
+    this.routePointList.update((current) => {
+      const newArray = [...current];
+      const [movedItem] = newArray.splice(event.oldIndex, 1);
+      newArray.splice(event.newIndex, 0, movedItem);
+      return newArray;
+    });
   }
 
   // --- Computed Validation Properties ---
 
   /** Checks if the current manual coordinates are mathematically valid. */
-  public get isManualAddValid(): boolean {
-    return CoordinateUtils.isValidGeographicCoordinate(this.manualLat(), this.manualLon());
-  }
+  public isManualAddValid = computed(() => {
+    const lat = this.manualLat();
+    const lon = this.manualLon();
+    if (lat === null || lon === null) return false;
+    return CoordinateUtils.isValidGeographicCoordinate(lat, lon);
+  });
+
+  /** Validates the currently typed route name against formatting and length rules. */
+  public nameError = computed(() => {
+    const name = this.routeName().trim();
+
+    // If the field is empty, we don't show a specific typing error yet
+    if (name.length === 0) return null;
+
+    // Rule 1: Must start with a letter.
+    // The '!' reverses the logic: if it does NOT match a starting letter, return error.
+    if (!/^[a-zA-Z]/.test(name)) return 'The route name must start with a letter.';
+
+    // Rule 2: Allowed characters.
+    // This regex looks for anything that is NOT (^) a letter, number, space, or hyphen.
+    if (/[^a-zA-Z0-9 -]/.test(name))
+      return 'Only letters, numbers, spaces, and hyphens are allowed.';
+
+    // Rule 3: Length limits.
+    if (name.length < 3 || name.length > 50)
+      return 'The name must be between 3 and 50 characters long.';
+
+    // If it passes all rules, return null (no errors)
+    return null;
+  });
 
   /**
    * Evaluates if the entire route is valid and ready to be saved to the database.
    * Requires at least two points (to form a line) and a valid route name.
-   * @returns True if the route can be saved, false otherwise.
    */
-  public get canSave(): boolean {
+  public canSave = computed(() => {
     return (
-      this.routeState.points().length >= 2 &&
-      this.routeName.trim().length > 0 &&
-      this.nameError === null
+      this.routePointList().length >= 2 &&
+      this.routeName().trim().length > 0 &&
+      this.nameError() === null
     );
-  }
+  });
 
   /**
    * Evaluates if there is any active route data that can be reset.
-   * @returns True if there is at least one point in the state, false otherwise.
    */
-  public get canReset(): boolean {
-    return this.routeState.points() && this.routeState.points().length > 0;
-  }
-
-  /**
-   * Validates the currently typed route name against formatting and length rules.
-   * @returns An error message string if a rule is violated, or `null` if the name is valid or empty.
-   */
-  get nameError(): string | null {
-    const name = this.routeName.trim();
-
-    // If the field is empty, we don't show a specific typing error yet
-    if (name.length === 0) {
-      return null;
-    }
-
-    // Rule 1: Must start with a letter.
-    // The '!' reverses the logic: if it does NOT match a starting letter, return error.
-    if (!/^[a-zA-Z]/.test(name)) {
-      return 'The route name must start with a letter.';
-    }
-
-    // Rule 2: Allowed characters.
-    // This regex looks for anything that is NOT (^) a letter, number, space, or hyphen.
-    if (/[^a-zA-Z0-9 -]/.test(name)) {
-      return 'Only letters, numbers, spaces, and hyphens are allowed.';
-    }
-
-    // Rule 3: Length limits.
-    if (name.length < 3 || name.length > 50) {
-      return 'The name must be between 3 and 50 characters long.';
-    }
-
-    // If it passes all rules, return null (no errors)
-    return null;
-  }
+  public canReset = computed(() => {
+    return this.routePointList().length > 0;
+  });
 }

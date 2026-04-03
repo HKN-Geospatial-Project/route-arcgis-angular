@@ -8,14 +8,15 @@
       <input
         type="text"
         id="routeName"
-        [(ngModel)]="routeName"
+        [ngModel]="routeName()"
+        (ngModelChange)="routeName.set($event)"
         placeholder="e.g., Morning Run"
         class="text-input"
       />
 
-      @if (nameError) {
+      @if (nameError()) {
         <small style="color: red">
-          {{ nameError }}
+          {{ nameError() }}
         </small>
       }
     </div>
@@ -28,7 +29,6 @@
       <div class="manual-inputs">
         <div class="input-col">
           <label>Latitude</label>
-
           <input
             type="number"
             [ngModel]="manualLat()"
@@ -40,7 +40,6 @@
 
         <div class="input-col">
           <label>Longitude</label>
-
           <input
             type="number"
             [ngModel]="manualLon()"
@@ -55,7 +54,7 @@
         class="btn-primary"
         (click)="addManualPoint()"
         disabled
-        [disabled]="!isManualAddValid"
+        [disabled]="!isManualAddValid()"
       >
         Add
       </button>
@@ -64,10 +63,10 @@
     <hr />
 
     <div class="points-list-container">
-      <h3>Route Points ({{ routeState.points().length }})</h3>
+      <h3>Route Points ({{ routePointList().length }})</h3>
 
       <component-route-point-list
-        [pointList]="routeState.points()"
+        [pointList]="routePointList()"
         (pointUpdated)="onListPointUpdated($event)"
         (pointDeleted)="onListPointDeleted($event)"
         (pointMoved)="onListPointMoved($event)"
@@ -78,10 +77,12 @@
 
     <div class="action-buttons">
       <button class="btn-secondary" (click)="goBack()">Back</button>
-      <button class="btn-danger" (click)="resetRoute()" disabled [disabled]="!canReset">
+
+      <button class="btn-danger" (click)="resetRoute()" disabled [disabled]="!canReset()">
         Reset
       </button>
-      <button class="btn-success" (click)="saveRoute()" disabled [disabled]="!canSave">
+
+      <button class="btn-success" (click)="saveRoute()" disabled [disabled]="!canSave()">
         Save Route
       </button>
     </div>

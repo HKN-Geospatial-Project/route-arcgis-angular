@@ -7,7 +7,7 @@ import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 
 // Application Imports
-import { ClickedPointVO } from '../../models/value-objects/clicked-point.vo';
+import { ClickedPointEvent } from '../../models/event/clicked-point.event';
 import { MapEventProviderService } from '../../abstract/services/map-event-provider.service';
 import { RouteGraphicsService } from '../../abstract/services/route-map-graphics.service';
 
@@ -73,10 +73,10 @@ export class ArcgisMapComponent implements OnInit, OnDestroy {
         const elevation = undefined;
 
         // Bundle all the data into our interface payload
-        const payload: ClickedPointVO = {
-          latitude: event.mapPoint.latitude ?? undefined,
-          longitude: event.mapPoint.longitude ?? undefined,
-          altitude: elevation !== undefined ? elevation : undefined,
+        const payload: ClickedPointEvent = {
+          latitude: event.mapPoint.latitude != null ? event.mapPoint.latitude : null,
+          longitude: event.mapPoint.longitude != null ? event.mapPoint.longitude : null,
+          altitude: elevation != null ? elevation : null,
           x: event.x,
           y: event.y,
         };
