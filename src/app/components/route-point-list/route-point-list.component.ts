@@ -94,7 +94,7 @@ export class RoutePointListComponent {
    * @param index - The original array index of the point being saved.
    */
   public saveEdit(index: number): void {
-    if (this.editLatitude && this.editLongitude) {
+    if (this.editLatitude != null && this.editLongitude != null) {
       // Construct the new point, maintaining any other properties it might have had
       const modifiedPoint: RoutePointListItem = {
         latitude: this.editLatitude,
@@ -105,7 +105,9 @@ export class RoutePointListComponent {
       // Close edit mode
       this.cancelEdit();
     } else {
-      console.log('invalid operation');
+      throw new Error(
+        `Critical Error: Failed to create RoutePointListItem. Coordinates cannot be null or undefined. Received latitude: ${this.editLatitude}, longitude: ${this.editLongitude}.`,
+      );
     }
   }
 
