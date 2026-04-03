@@ -2,7 +2,15 @@ import { RoutePointListItem } from '../components/route-point-list/route-point-l
 import { RoutePointVO } from '../map-library/models/value-objects/route-point.vo';
 import { RoutePointType } from '../models/enums/route-point-type.enum';
 
+/**
+ * Utility class handling data transformations between domain Value Objects (VOs)
+ * and UI-specific structural models (like Route List Items).
+ */
 export class DataMapConversionUtils {
+  /**
+   * Constructs a domain RoutePointVO from raw numerical inputs, enforcing strict null checks.
+   * @throws {Error} If either latitude or longitude is null or undefined.
+   */
   public static convertToRoutePointVO(
     latitude: number | null | undefined,
     longitude: number | null | undefined,
@@ -10,7 +18,9 @@ export class DataMapConversionUtils {
     type: RoutePointType = RoutePointType.NOT_DEFINED,
   ) {
     if (latitude == null || longitude == null) {
-      throw new Error(`Critical Error: RoutePointVO is missing coordinates.`);
+      throw new Error(
+        `Critical Error: Failed to create RoutePointVO. Coordinates cannot be null or undefined. Received latitude: ${latitude}, longitude: ${longitude}.`,
+      );
     }
     return {
       latitude: latitude,
@@ -20,6 +30,10 @@ export class DataMapConversionUtils {
     };
   }
 
+  /**
+   * Strips a domain VO down to a basic UI list item, guaranteeing valid numbers.
+   * @throws {Error} If the domain VO is missing strict coordinate values.
+   */
   public static convertPointVOToRoutePointListItem(point: RoutePointVO): RoutePointListItem {
     if (point.latitude == null || point.longitude == null) {
       throw new Error(`Critical Error: RoutePointVO is missing coordinates.`);
@@ -31,6 +45,9 @@ export class DataMapConversionUtils {
     };
   }
 
+  /**
+   * Promotes a basic UI list item back to a domain VO, applying default fallback properties.
+   */
   public static convertRoutePointListItemToRoutePointVO(point: RoutePointListItem): RoutePointVO {
     return {
       latitude: point.latitude,
@@ -40,6 +57,10 @@ export class DataMapConversionUtils {
     };
   }
 
+  /**
+   * Maps an array of domain VOs to UI list items, validating coordinates for each item.
+   * @throws {Error} If any object in the array contains invalid coordinates.
+   */
   public static convertListRoutePointVOToRoutePointListItem(
     list: RoutePointVO[],
   ): RoutePointListItem[] {
@@ -57,6 +78,9 @@ export class DataMapConversionUtils {
     return mappedPoints;
   }
 
+  /**
+   * Maps an array of UI list items back to domain VOs with default fallback properties.
+   */
   public static convertListRoutePointListItemToRoutePointVO(
     list: RoutePointListItem[],
   ): RoutePointVO[] {

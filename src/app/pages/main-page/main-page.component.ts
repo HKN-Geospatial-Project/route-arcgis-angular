@@ -8,6 +8,7 @@ import { DTORouteConversionUtils } from '../../utils/dto-route-conversion.utils'
 import { FileListComponent, FileItem } from '../../components/file-list/file-list.component';
 import { RouteDataService } from '../../services/route-data-service';
 import { RouteGraphicsService } from '../../map-library/abstract/services/route-map-graphics.service';
+import { RoutePointVO } from '../../map-library/models/value-objects/route-point.vo';
 
 /**
  * The primary entry point of the application.
@@ -118,9 +119,10 @@ export class MainPageComponent implements OnInit {
     if (item) {
       this.routeDataService.getById(item.id).subscribe({
         next: (response) => {
-          const mappedPoints = DTORouteConversionUtils.convertListRoutePointDTOToRoutePointVO(
-            response.points,
-          );
+          const mappedPoints: RoutePointVO[] = [];
+          response.points.forEach((item) => {
+            mappedPoints.push(DTORouteConversionUtils.convertRoutePointVOToRoutePointDTO(item));
+          });
           this.routeGraphicsService.renderRoute(mappedPoints);
         },
         error: (err) => {

@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 // Application Core Imports
-import { ClickedPointVO } from '../../map-library/models/value-objects/clicked-point.vo';
+import { ClickedPointEvent } from '../../map-library/models/event/clicked-point.event';
 import { CoordinateUtils } from '../../utils/coordinate.utils';
 import { DataMapConversionUtils } from '../../utils/data-map-conversion.utils';
 import { DTORouteConversionUtils } from '../../utils/dto-route-conversion.utils';
@@ -51,9 +51,10 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   /** Centralized state manager for the route points. */
   private routeState = inject(RouteStateService);
 
-  public routePointList = signal<RoutePointListItem[]>([]);
-
   // --- State Variables ---
+
+  /** Reactive Signal holding the list of formatted points to be displayed in the UI. */
+  public routePointList = signal<RoutePointListItem[]>([]);
 
   /** The user-defined name for the route being created. */
   public routeName: string = '';
@@ -87,7 +88,6 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
           DataMapConversionUtils.convertListRoutePointVOToRoutePointListItem(currentPoints);
 
         this.routePointList.set(mappedPoints);
-
         this.routeService.renderRoute(currentPoints);
       }
     });
@@ -97,7 +97,7 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     /** When the user clicks the map, the coordinates automatically populate the manual input signals. */
     this.clickSubscription = this.mapEventProviderService.mapClicked$.subscribe(
-      (clickedCoordinate: ClickedPointVO) => {
+      (clickedCoordinate: ClickedPointEvent) => {
         this.manualLat.set(clickedCoordinate.latitude);
         this.manualLon.set(clickedCoordinate.longitude);
       },
@@ -110,6 +110,8 @@ export class CreateRoutePageComponent implements OnInit, OnDestroy {
       this.clickSubscription.unsubscribe();
     }
   }
+
+  // --- Core Actions ---
 
   /** Pushes the coordinates currently in the manual input fields into the global RouteState. */
   public addManualPoint(): void {
